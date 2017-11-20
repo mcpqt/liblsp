@@ -93,7 +93,6 @@ void SocketMessageReader::read() {
 
   if (!Msg.tryParseBody()) {
     error("Failed to parse json data.");
-    return;
   }
   callback(Msg.getData());
 }
