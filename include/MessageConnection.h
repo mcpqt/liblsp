@@ -20,7 +20,6 @@ namespace lsp {
 
 typedef std::function<void(const json &,json &)>
     RequestHandler;
-typedef std::function<void(const json &)> NotificationHandler;
 
 
 class MessageConnection {
@@ -32,7 +31,6 @@ class MessageConnection {
   std::map<std::string,JsonPtr> ResponseMap;
 
   std::map<std::string,RequestHandler> RequestHandlers;
-  std::map<std::string,NotificationHandler> NotificationHandlers;
 
   std::thread QueueThread;
   std::mutex RequestMutex;
@@ -41,6 +39,8 @@ class MessageConnection {
 
   std::condition_variable RequestCV;
   std::condition_variable ResponseCV;
+
+  uint32_t IdCounter = 0;
 
 public:
   MessageConnection(MessageReader *Reader, MessageWriter *Writer, Logger *Log)
@@ -59,8 +59,13 @@ public:
   template<typename T>
   void replyError(const ErrorResponse<T> & Response);
 
-  void call(const std::string & Method, const json & Params, json & Result);
+  JsonPtr call(const std::string & Method, const json & Params);
+  void request(const std::string & Method, const std::string & Id, const json & Data);
   void notify(const std::string & Method, const json & Data);
+
+  void registerHandler(const std::string & Method, RequestHandler Handler) {
+    RequestHandlers[Method] = Handler;
+  }
 
   void processMessageQueue();
 
