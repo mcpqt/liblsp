@@ -13,6 +13,12 @@ public:
     Connection.registerHandler(
         "initialize", std::bind(&LanguageServer::handleInitialize, this,
                                 std::placeholders::_1, std::placeholders::_2));
+    Connection.registerHandler(
+        "shutdown", std::bind(&LanguageServer::handleShutdown, this,
+                              std::placeholders::_1, std::placeholders::_2));
+    Connection.registerHandler("exit", std::bind(&LanguageServer::handleExit,
+                                                 this, std::placeholders::_1,
+                                                 std::placeholders::_2));
     Connection.registerHandler("textDocument/hover",
                                std::bind(&LanguageServer::handleHover, this,
                                          std::placeholders::_1,
@@ -23,7 +29,7 @@ public:
                                          std::placeholders::_2));
     Connection.registerHandler(
         "textDocument/didChange",
-        std::bind(&LanguageServer::handleTextDocumentDidChange, this, 
+        std::bind(&LanguageServer::handleTextDocumentDidChange, this,
                   std::placeholders::_1, std::placeholders::_2));
   }
 
@@ -35,8 +41,13 @@ public:
   virtual void
   textDocumentDidChange(const TextDocumentDidChangeParams &Params) = 0;
 
+  virtual void shutdown() = 0;
+  virtual void exit() = 0;
+
 protected:
   void handleInitialize(const json &Params, json &Result);
+  void handleShutdown(const json &Params, json &Result);
+  void handleExit(const json &Params, json &Result);
   void handleHover(const json &Params, json &Result);
   void handleCompletion(const json &Params, json &Result);
   void handleTextDocumentDidChange(const json &Params, json &Result);
