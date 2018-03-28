@@ -53,6 +53,7 @@ template <typename T> struct ErrorResponse {
     return Response;
   }
 };
+
 struct Position {
   uint32_t Line;
   uint32_t Character;
@@ -303,6 +304,11 @@ template <typename T> struct InitializeParams {
   }
 };
 
+struct InitializedParams {
+  friend void from_json(const json &Data,
+                        InitializedParams &Params){};
+};
+
 enum class TextDocumentSyncKind { None = 0, Full = 1, Incremental = 2 };
 
 struct SaveOptions {
@@ -365,7 +371,7 @@ void to_json(json &Data, const LogMessageParams &Params);
 void from_json(const json &Data, LogMessageParams &Params);
 
 struct TextDocumentPositionParams {
-  lsp::VersionedTextDocumentIdentifier TextDocument;
+  lsp::TextDocumentIdentifier TextDocument;
   lsp::Position Position;
 
   friend void from_json(const json &Params, TextDocumentPositionParams &TDP);

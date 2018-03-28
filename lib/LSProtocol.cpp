@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-only
-#include "LSProtocol.h"
+#include "lsp/LSProtocol.h"
 
 using namespace lsp;
 

@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 #ifndef LSP_LANGUAGECLIENT_H
 #define LSP_LANGUAGECLIENT_H
-#include "LSProtocol.h"
-#include "MessageConnection.h"
+#include <lsp/LSProtocol.h>
+#include <lsp/MessageConnection.h>
 
 namespace lsp {
 class LanguageClient {
