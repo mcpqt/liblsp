@@ -19,7 +19,8 @@ using json = nlohmann::json;
 
 namespace lsp {
 
-typedef std::function<void(const json &, json &)> RequestHandler;
+typedef std::function<void(const json &)> NotificationHandler;
+typedef std::function<json(const json &)> RequestHandler;
 
 /// Message connection for passing messages between client and server
 /// The MessageConnection class is thread save for all operations.
@@ -35,6 +36,8 @@ class MessageConnection {
   std::queue<JsonPtr> RequestQueue;
   /// Lookup map for request handlers
   std::map<std::string, RequestHandler> RequestHandlers;
+  /// Lookup map for notification handlers
+  std::map<std::string, NotificationHandler> NotificationHandlers;
   /// Lookup map for response data
   std::map<std::string, JsonPtr> ResponseMap;
 
