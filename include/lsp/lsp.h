@@ -2,7 +2,7 @@
 #ifndef LSP_LSP_H
 #define LSP_LSP_H
 
-#include <lsp/MessageConnection.h>
+#include <lsp/jsonrpc/MessageConnection.h>
 
 #include <asio.hpp>
 
