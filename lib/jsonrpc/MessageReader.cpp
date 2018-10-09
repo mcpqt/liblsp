@@ -5,7 +5,7 @@
 #include <iterator>
 #include <string>
 
-#include "MessageReader.h"
+#include <lsp/jsonrpc/MessageReader.h>
 
 using namespace lsp;
 
@@ -21,7 +21,7 @@ std::size_t MessageReader::getLength(const std::string &Header) {
 
   try {
     return stoul(Header.substr(Colon+1));
-  } catch {
+  } catch(...) {
     return 0;
   }
 
