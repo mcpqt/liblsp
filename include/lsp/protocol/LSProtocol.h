@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 #ifndef LSPROTOCOL_H
 #define LSPROTOCOL_H
+#include <lsp/jsonrpc/Message.h>
 
 #include <nlohmann/json.hpp>
 #include <list>
@@ -317,10 +318,13 @@ struct ServerCapabilities {
   bool HoverProvider;
   CompletionOptions CompletionProvider;
 
+  bool DocumentFormattingProvider;
+
   friend void to_json(json &Data, const ServerCapabilities &SC) {
     Data["textDocumentSync"] = SC.TextDocumentSync;
     Data["hoverProvider"] = SC.HoverProvider;
     Data["completionProvider"] = SC.CompletionProvider;
+    Data["documentFormattingProvider"] = SC.DocumentFormattingProvider;
   }
 };
 
@@ -447,6 +451,8 @@ template <typename T> struct CompletionItem {
   friend void to_json(json &Data, const CompletionItem<EmptyCompletionData> &Item);
 };
 void to_json(json &Data, const CompletionItem<EmptyCompletionData> &Item);
+
+extern RequestType<InitializeParams<std::string>, InitializeResult> InitializeRequest;
 
 }; // namespace lsp
 
