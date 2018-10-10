@@ -3,8 +3,8 @@
 #define LSPROTOCOL_H
 #include <lsp/jsonrpc/Message.h>
 
-#include <nlohmann/json.hpp>
 #include <list>
+#include <nlohmann/json.hpp>
 #include <optional>
 #include <string>
 
@@ -281,8 +281,7 @@ template <typename T> struct InitializeParams {
 };
 
 struct InitializedParams {
-  friend void from_json(const json &Data,
-                        InitializedParams &Params){};
+  friend void from_json(const json &Data, InitializedParams &Params){};
 };
 
 enum class TextDocumentSyncKind { None = 0, Full = 1, Incremental = 2 };
@@ -336,8 +335,6 @@ struct InitializeResult {
   }
 };
 
-
-
 struct LogMessageParams {
   enum class MessageType { Error = 1, Warning = 2, Info = 3, Log = 4 };
 
@@ -363,11 +360,12 @@ void from_json(const json &Params, TextDocumentPositionParams &TDP);
  * Workspace changes
  */
 struct TextDocumentContentChangeEvent {
-	std::optional<lsp::Range> Range;
-	std::optional<uint32_t> RangeLength;
-	std::string Text;
+  std::optional<lsp::Range> Range;
+  std::optional<uint32_t> RangeLength;
+  std::string Text;
 
-  friend void from_json(const json &Params, TextDocumentContentChangeEvent &DCP);
+  friend void from_json(const json &Params,
+                        TextDocumentContentChangeEvent &DCP);
 };
 void from_json(const json &Params, TextDocumentContentChangeEvent &DCP);
 
@@ -425,7 +423,7 @@ void from_json(const json &Data, CompletionContext &CC);
 
 struct CompletionParams : public TextDocumentPositionParams {
   optional<CompletionContext> Context;
-  
+
   friend void from_json(const json &Data, CompletionParams &CP);
 };
 void from_json(const json &Data, CompletionParams &CP);
@@ -448,12 +446,42 @@ template <typename T> struct CompletionItem {
   lsp::Command Command;
   T Data;
 
-  friend void to_json(json &Data, const CompletionItem<EmptyCompletionData> &Item);
+  friend void to_json(json &Data,
+                      const CompletionItem<EmptyCompletionData> &Item);
 };
 void to_json(json &Data, const CompletionItem<EmptyCompletionData> &Item);
 
-extern RequestType<InitializeParams<std::string>, InitializeResult> InitializeRequest;
+extern RequestType<InitializeParams<std::string>, InitializeResult>
+    InitializeRequest;
 
-}; // namespace lsp
+/*
+ * Language feautures
+ */
+
+// TextDocument formatting
+struct FormattingOptions {
+  unsigned TabSize;
+  bool InsertSpaces;
+
+  friend void to_json(json &Data, const FormattingOptions &Item);
+  friend void from_json(const json &Data, FormattingOptions &Item);
+};
+void to_json(json &Data, const FormattingOptions &Item);
+void from_json(const json &Data, FormattingOptions &Item);
+
+struct DocumentFormattingParams {
+  TextDocumentIdentifier TextDocument;
+  FormattingOptions Options;
+
+  friend void to_json(json &Data, const DocumentFormattingParams &Item);
+  friend void from_json(const json &Data, DocumentFormattingParams &Item);
+};
+void to_json(json &Data, const DocumentFormattingParams &Item);
+void from_json(const json &Data, DocumentFormattingParams &Item);
+
+extern RequestType<DocumentFormattingParams, std::vector<TextEdit>>
+    TextDocumentFormatting;
+
+} // namespace lsp
 
 #endif // !LSPROTOCOL_H
