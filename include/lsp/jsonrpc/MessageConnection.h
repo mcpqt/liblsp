@@ -44,7 +44,6 @@ class MessageConnection {
   // Thread mutexes
   std::mutex RequestMutex;
   std::mutex ResponseMutex;
-  std::mutex WriterMutex;
 
   // Thread condition variables
   std::condition_variable RequestCV;
@@ -70,11 +69,6 @@ public:
     Reader->onClose(std::bind(&MessageConnection::closeHandler, this));
   };
 
-  void setLogger(Logger *NewLog) {
-    delete Log;
-    Log = NewLog;
-  }
-
   /// Start listening for incomming messages
   void listen();
 
@@ -94,6 +88,11 @@ private:
   void errorHandler(const Error &Err);
   void closeHandler();
   void messageHandler(MessagePtr Data);
+  
+  void handleRequest(const RequestMessage &Msg);
+  void handleNotification(const NotificationMessage &Msg);
+  void handleResponse(const ResponseMessage &Msg);
+  void handleInvalid(const Message &Msg);
 };
 } // namespace lsp
 #endif
