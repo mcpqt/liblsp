@@ -24,6 +24,4 @@ std::size_t MessageReader::getLength(const std::string &Header) {
   } catch(...) {
     return 0;
   }
-
- 
 }
