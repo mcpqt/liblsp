@@ -2,7 +2,7 @@
 #ifndef LSP_LANGUAGECLIENT_H
 #define LSP_LANGUAGECLIENT_H
 #include "protocol/LSProtocol.h"
-#include "jsonrpc/MessageConnection.h"
+#include "rpc/session.h"
 
 namespace lsp {
 class LanguageClient {
@@ -14,21 +14,21 @@ public:
 };
 
 class ProxyLanguageClient : public LanguageClient {
-  MessageConnection &Connection;
+  rpc::Session &Connection;
 
 public:
-  ProxyLanguageClient(MessageConnection &Connection) : Connection(Connection) {}
+  ProxyLanguageClient(rpc::Session &Connection) : Connection(Connection) {}
 
   virtual void showMessage(const LogMessageParams &Params) {
-    Connection.sendNotification(ShowMessage, Params);
+    Connection.send_notification(ShowMessage, rpc::to_json(Params));
   }
 
   virtual void logMessage(const LogMessageParams &Params) {
-    //Connection.sendNotification(LogMessage, Params);
+    //Connection.send_notification(LogMessage, rpc::to_json(Params));
   }
 
   virtual void publishDiagnostics(const PublishDiagnosticsParams &Params) {
-      //Connection.sendNotification(PublishDiagnostics, Params);
+      //Connection.send_notification(PublishDiagnostics, rpc::to_json(Params));
   }
 };
 }; // namespace lsp

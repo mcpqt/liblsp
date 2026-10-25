@@ -2,14 +2,15 @@
 #ifndef LSP_LSP_H
 #define LSP_LSP_H
 
-#include "jsonrpc/MessageConnection.h"
+#include "rpc/session.h"
 
 #include <QString>
+#include <memory>
 
 namespace lsp {
 
-MessageConnection *createStdIoConnection();
-MessageConnection *createQtTCPConnection(const QString &Hostname, quint16 Port);
+std::unique_ptr<Session> createStdIoConnection();
+std::unique_ptr<Session> createQtTCPConnection(const QString &Hostname, quint16 Port);
 
 } // namespace lsp
 #endif

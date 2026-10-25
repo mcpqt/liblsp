@@ -1,15 +1,23 @@
 // SPDX-License-Identifier: AGPL-3.0-only
-#include "jsonrpc/QtMessageHandler.h"
 #include "lsp.h"
+
+#include "rpc/qt_tcp_transport.h"
+#include "rpc/session.h"
+#include "rpc/stdio_transport.h"
 
 #include <QTcpSocket>
 
 #include <stdexcept>
 
-using namespace lsp;
+namespace lsp {
 
-MessageConnection *lsp::createQtTCPConnection(const QString &Hostname,
-                                              quint16 Port) {
+std::unique_ptr<lsp::Session> createStdIoConnection() {
+  auto transport = std::make_unique<lsp::StdioTransport>();
+  return std::make_unique<lsp::Session>(std::move(transport));
+}
+
+std::unique_ptr<lsp::Session> createQtTCPConnection(const QString &Hostname,
+                                                    quint16 Port) {
   QTcpSocket *Socket = new QTcpSocket();
   Socket->connectToHost(Hostname, Port);
   if (!Socket->waitForConnected(5000)) {
@@ -18,7 +26,8 @@ MessageConnection *lsp::createQtTCPConnection(const QString &Hostname,
     throw std::runtime_error(ErrorString.toUtf8().constData());
   }
 
-  QtMessageReader *Reader = new QtMessageReader(Socket);
-  QtMessageWriter *Writer = new QtMessageWriter(Socket);
-  return new MessageConnection(Reader, Writer);
+  auto transport = std::make_unique<lsp::rpc::QtTcpTransport>(Socket);
+  return std::make_unique<lsp::Session>(std::move(transport));
 }
+
+} // namespace lsp

@@ -2,24 +2,25 @@
 #ifndef LSP_REMOTE_H
 #define LSP_REMOTE_H
 
-#include "jsonrpc/MessageConnection.h"
+#include "rpc/session.h"
 #include "protocol/LSProtocol.h"
+
+#include <memory>
 
 namespace lsp {
 class Remote {
 public:
-  void attach(MessageConnectionPtr MsgConnection) {
+  void attach(std::shared_ptr<rpc::Session> MsgConnection) {
     Connection = MsgConnection;
   }
   
   virtual void initialize(const ClientCapabilities &CC) = 0;
 
 protected:
-  MessageConnectionPtr Connection;
+  std::shared_ptr<rpc::Session> Connection;
 
 };
 
-class Remote
 } // namespace lsp
 
 #endif // DEBUG

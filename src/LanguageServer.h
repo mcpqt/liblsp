@@ -3,7 +3,7 @@
 #define LSP_LANGUAGESERVER_H
 
 #include "protocol/LSProtocol.h"
-#include "jsonrpc/MessageConnection.h"
+#include "rpc/session.h"
 
 #include <functional>
 #include <type_traits>
@@ -12,7 +12,7 @@ namespace lsp {
 class LanguageServer {
 
 public:
-  void connect(MessageConnection &Connection);
+  void connect(rpc::Session &Connection);
 
   /*
    * General functions

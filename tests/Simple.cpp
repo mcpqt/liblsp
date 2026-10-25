@@ -2,10 +2,10 @@
 #include <QCoreApplication>
 #include "lsp.h"
 #include "protocol/LSProtocol.h"
+#include "rpc/json.h"
 
 #include <cstdlib>
 #include <iostream>
-#include <thread>
 
 lsp::InitializeResult asd(const lsp::InitializeParams<QString> &Params) {
   lsp::InitializeResult res;
@@ -29,30 +29,32 @@ void TDchange(const lsp::TextDocumentDidChangeParams &Params) { return; }
 
 int main(int argc, char *argv[]) {
   QCoreApplication App(argc, argv);
-  lsp::MessageConnection *Con = lsp::createQtTCPConnection(
+  auto Con = lsp::createQtTCPConnection(
       QStringLiteral("localhost"), static_cast<quint16>(19191));
-  std::function<lsp::InitializeResult(
-      const lsp::InitializeParams<QString> &)>
-      Func(&asd);
-  Con->registerRequestHandler(lsp::InitializeRequest, Func);
-  Con->registerRequestHandler(lsp::TextDocumentFormatting,
-                              std::function(&format));
-  Con->registerNotificationHandler(lsp::TextDocumentDidOpen,
-                                   std::function(&TDopen));
-  Con->registerNotificationHandler(lsp::TextDocumentDidChange,
-                                   std::function(&TDchange));
-  Con->listen();
+
+  Con->set_request_handler(
+      lsp::InitializeRequest, [](const QJsonValue &params) -> QJsonValue {
+        auto p = lsp::from_json<lsp::InitializeParams<QString>>(params);
+        return lsp::to_json(asd(p));
+      });
+  Con->set_request_handler(
+      lsp::TextDocumentFormatting, [](const QJsonValue &params) -> QJsonValue {
+        auto p = lsp::from_json<lsp::DocumentFormattingParams>(params);
+        return lsp::to_json(format(p));
+      });
+  Con->set_notification_handler(
+      lsp::TextDocumentDidOpen, [](const QJsonValue &params) {
+        auto p = lsp::from_json<lsp::TextDocumentDidOpenParams>(params);
+        TDopen(p);
+      });
+  Con->set_notification_handler(
+      lsp::TextDocumentDidChange, [](const QJsonValue &params) {
+        auto p = lsp::from_json<lsp::TextDocumentDidChangeParams>(params);
+        TDchange(p);
+      });
+  Con->start();
 
   try {
-    std::thread Worker([Con] {
-      try {
-        while (true)
-          Con->processMessageQueue();
-      } catch (...) {
-        return;
-      }
-    });
-    Worker.detach();
     return App.exec();
   } catch (std::exception &e) {
     std::cerr << "Exception: " << e.what() << "\n";

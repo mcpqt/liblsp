@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 #ifndef LSPROTOCOL_H
 #define LSPROTOCOL_H
-#include "jsonrpc/Message.h"
+#include "rpc/json.h"
 
 #include <QString>
 
@@ -408,7 +408,7 @@ struct LogMessageParams {
 void to_json(QJsonValue &Data, const LogMessageParams &Params);
 void from_json(const QJsonValue &Data, LogMessageParams &Params);
 
-extern NotificationType<LogMessageParams> ShowMessage;
+inline const QString ShowMessage = "window/showMessage";
 
 struct TextDocumentPositionParams {
   lsp::TextDocumentIdentifier TextDocument;
@@ -425,7 +425,7 @@ struct TextDocumentDidOpenParams {
 };
 void from_json(const QJsonValue &Params, TextDocumentDidOpenParams &TDP);
 
-extern NotificationType<TextDocumentDidOpenParams> TextDocumentDidOpen;
+inline const QString TextDocumentDidOpen = "textDocument/didOpen";
 
 /*
  * Workspace changes
@@ -447,7 +447,7 @@ struct TextDocumentDidChangeParams {
   friend void from_json(const QJsonValue &Params, TextDocumentDidChangeParams &DCP);
 };
 void from_json(const QJsonValue &Params, TextDocumentDidChangeParams &DCP);
-extern NotificationType<TextDocumentDidChangeParams> TextDocumentDidChange;
+inline const QString TextDocumentDidChange = "textDocument/didChange";
 
 enum class MarkupKind { Plaintext, Markdown };
 
@@ -544,8 +544,7 @@ template <typename T> struct CompletionItem {
 };
 void to_json(QJsonValue &Data, const CompletionItem<EmptyCompletionData> &Item);
 
-extern RequestType<InitializeParams<QString>, InitializeResult>
-    InitializeRequest;
+inline const QString InitializeRequest = "initialize";
 
 /*
  * Language feautures
@@ -572,8 +571,7 @@ struct DocumentFormattingParams {
 void to_json(QJsonValue &Data, const DocumentFormattingParams &Item);
 void from_json(const QJsonValue &Data, DocumentFormattingParams &Item);
 
-extern RequestType<DocumentFormattingParams, std::vector<TextEdit>>
-    TextDocumentFormatting;
+inline const QString TextDocumentFormatting = "textDocument/formatting";
 
 } // namespace lsp
 

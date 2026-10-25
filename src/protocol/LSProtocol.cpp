@@ -1,11 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-only
-#include "jsonrpc/Message.h"
+#include "rpc/json.h"
 #include "protocol/LSProtocol.h"
 
 using namespace lsp;
-
-RequestType<InitializeParams<QString>, InitializeResult>
-    lsp::InitializeRequest("initialize");
 
 void Position::parse(QJsonObject *Object) {
   if (Object->contains("line"))
@@ -44,8 +41,6 @@ void lsp::from_json(const QJsonValue &Data, LogMessageParams &Params) {
   Params.type = static_cast<LogMessageParams::MessageType>(
       Object.value("type").toInt());
 }
-
-NotificationType<LogMessageParams> ShowMessage("window/showMessage");
 
 void lsp::from_json(const QJsonValue &Data, TextDocumentItem &Item) {
   const QJsonObject Object = as_object(Data);
@@ -87,9 +82,6 @@ void lsp::from_json(const QJsonValue &Params, TextDocumentDidOpenParams &TDO) {
   TDO.TextDocument =
       from_json<TextDocumentItem>(Object.value("textDocument"));
 }
-NotificationType<TextDocumentDidOpenParams>
-    lsp::TextDocumentDidOpen("textDocument/didOpen");
-
 void lsp::from_json(const QJsonValue &Data, TextDocumentContentChangeEvent &CCE) {
   const QJsonObject Object = as_object(Data);
   if (Object.contains("range") && !Object.value("range").isNull())
@@ -107,9 +99,6 @@ void lsp::from_json(const QJsonValue &Params, TextDocumentDidChangeParams &DCP) 
   DCP.ContentChanges = from_json<std::vector<TextDocumentContentChangeEvent>>(
       Object.value("contentChanges"));
 }
-NotificationType<TextDocumentDidChangeParams>
-    lsp::TextDocumentDidChange("textDocument/didChange");
-
 void lsp::to_json(QJsonValue &Data, const CompletionOptions &O) {
   QJsonObject Object;
   Object["resolveProvider"] = O.ResolveProvider;
@@ -170,5 +159,3 @@ void lsp::from_json(const QJsonValue &Data, DocumentFormattingParams &Item) {
       from_json<TextDocumentIdentifier>(Object.value("textDocument"));
   Item.Options = from_json<FormattingOptions>(Object.value("options"));
 }
-RequestType<DocumentFormattingParams, std::vector<TextEdit>>
-    lsp::TextDocumentFormatting("textDocument/formatting");
