@@ -2,8 +2,8 @@
 #ifndef LSP_LSPLOGGER_H
 #define LSP_LSPLOGGER_H
 
-#include <lsp/LanguageClient.h>
-#include <lsp/Logger.h>
+#include "LanguageClient.h"
+#include "Logger.h"
 
 namespace lsp {
 class LspLogger : public Logger {
@@ -12,22 +12,22 @@ class LspLogger : public Logger {
 public:
   LspLogger(LanguageClient *Client) : Client(Client) {}
   /// Log an error message
-  virtual void error(const std::string &Message) const {
+  virtual void error(const QString &Message) const {
     Client->logMessage({lsp::LogMessageParams::MessageType::Error, Message});
   }
 
   /// Log an info message
-  virtual void info(const std::string &Message) const {
+  virtual void info(const QString &Message) const {
     Client->logMessage({lsp::LogMessageParams::MessageType::Info, Message});
   }
 
   /// Log a warning message
-  virtual void warning(const std::string &Message) const {
+  virtual void warning(const QString &Message) const {
     Client->logMessage({lsp::LogMessageParams::MessageType::Warning, Message});
   }
 
   /// Log a generic message
-  virtual void log(const std::string &Message) const {
+  virtual void log(const QString &Message) const {
     Client->logMessage({lsp::LogMessageParams::MessageType::Log, Message});
   }
 };

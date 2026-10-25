@@ -2,7 +2,7 @@
 #ifndef LSP_MESSAGEWRITER_H
 #define LSP_MESSAGEWRITER_H
 
-#include <lsp/jsonrpc/Message.h>
+#include "jsonrpc/Message.h"
 
 namespace lsp {
 

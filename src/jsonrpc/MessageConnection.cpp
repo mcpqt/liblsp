@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-only
-#include <lsp/jsonrpc/MessageConnection.h>
+#include "jsonrpc/MessageConnection.h"
 
 using namespace lsp;
 
@@ -33,55 +33,6 @@ void MessageConnection::listen() {
                            std::placeholders::_1));
 }
 
-#if 0
-void MessageConnection::notify(const std::string &Method, const json &Data) {
-  JsonPtr Request = std::make_shared<json>();
-
-  (*Request)["jsonrpc"] = "2.0";
-  (*Request)["method"] = Method;
-  (*Request)["params"] = Data;
-
-  Writer->write(Request);
-}
-
-JsonPtr MessageConnection::call(const std::string &Method, const json &Data) {
-  std::stringstream IdStream;
-  IdStream << Method << "-" << IdCounter++;
-
-  std::string Id = IdStream.str();
-  request(Method, Id, Data);
-
-  std::unique_lock<std::mutex> Lock(ResponseMutex);
-  ResponseCV.wait(Lock, [this, &Id]() {
-    return ResponseMap.find(Id) != ResponseMap.end();
-  });
-
-  auto Itr = ResponseMap.find(Id);
-  JsonPtr Ptr = Itr->second;
-  json &Response = *Ptr;
-
-  ResponseMap.erase(Itr);
-  if (Response.find("error") != Response.end()) {
-    // Maybe throw
-  }
-  if (Response.find("result") == Response.end()) {
-    // Maybe throw
-  }
-  return Ptr;
-}
-
-void MessageConnection::request(const std::string &Method,
-                                const std::string &Id, const json &Data) {
-  JsonPtr Request = std::make_shared<json>();
-
-  (*Request)["jsonrpc"] = "2.0";
-  (*Request)["method"] = Method;
-  (*Request)["id"] = Id;
-  (*Request)["params"] = Data;
-
-  Writer->write(Request);
-}
-#endif
 
 void MessageConnection::processMessageQueue() {
   std::unique_lock<std::mutex> Lock(RequestMutex);
@@ -118,10 +69,25 @@ void MessageConnection::handleRequest(RequestMessage &Msg) {
   auto Handler = RequestHandlers.find(Msg.getMethod());
   if (Handler != RequestHandlers.end()) {
     try {
-      Handler->second(Msg.getParams(), Resp.getResult());
+      Resp.setResult(Handler->second(Msg.getParams()));
+    } catch (const Error &Err) {
+      Resp.setError(Err.object());
+    } catch (const std::exception &Err) {
+      ErrorObject ErrObj;
+      ErrObj.code = error_code::internal_error;
+      ErrObj.message = QString::fromUtf8(Err.what());
+      Resp.setError(ErrObj);
     } catch (...) {
-      // TODO:
+      ErrorObject ErrObj;
+      ErrObj.code = error_code::internal_error;
+      ErrObj.message = QStringLiteral("Internal error");
+      Resp.setError(ErrObj);
     }
+  } else {
+    ErrorObject ErrObj;
+    ErrObj.code = error_code::method_not_found;
+    ErrObj.message = QStringLiteral("Method not found");
+    Resp.setError(ErrObj);
   }
   Writer->write(std::move(RespMsg));
 }

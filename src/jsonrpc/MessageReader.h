@@ -2,12 +2,13 @@
 #ifndef LSP_MESSAGE_READER_H
 #define LSP_MESSAGE_READER_H
 
-#include <lsp/jsonrpc/Event.h>
-#include <lsp/jsonrpc/Message.h>
+#include "jsonrpc/Event.h"
+#include "jsonrpc/Message.h"
+
+#include <QString>
 
 #include <functional>
 #include <memory>
-#include <nlohmann/json.hpp>
 
 namespace lsp {
 typedef Event::Emitter<const Error &>::CallbackFunction ErrorFunction;
@@ -46,7 +47,7 @@ public:
   virtual void listen(CallbackFunction Callback) = 0;
 
 protected:
-  static std::size_t getLength(const std::string &Header);
+  static std::size_t getLength(const QString &Header);
 };
 } // namespace lsp
 #endif

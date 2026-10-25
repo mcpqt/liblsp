@@ -13,7 +13,7 @@ public:
   std::vector<CallbackFunction> Callbacks;
   void on(CallbackFunction Func) { Callbacks.push_back(Func); }
 
-  void emit(T... args) {
+  void emitEvent(T... args) {
     for (auto &Callback : Callbacks) {
       Callback(args...);
     }

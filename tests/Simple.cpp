@@ -1,15 +1,13 @@
 // SPDX-License-Identifier: AGPL-3.0-only
-#include <asio.hpp>
-#include <lsp/lsp.h>
-#include <lsp/protocol/LSProtocol.h>
+#include <QCoreApplication>
+#include "lsp.h"
+#include "protocol/LSProtocol.h"
 
 #include <cstdlib>
 #include <iostream>
 #include <thread>
 
-using asio::ip::tcp;
-
-lsp::InitializeResult asd(const lsp::InitializeParams<std::string> &Params) {
+lsp::InitializeResult asd(const lsp::InitializeParams<QString> &Params) {
   lsp::InitializeResult res;
   res.Capabilities.DocumentFormattingProvider = true;
   res.Capabilities.TextDocumentSync.OpenClose = true;
@@ -30,11 +28,11 @@ void TDopen(const lsp::TextDocumentDidOpenParams &Params) { return; }
 void TDchange(const lsp::TextDocumentDidChangeParams &Params) { return; }
 
 int main(int argc, char *argv[]) {
-  asio::io_service service;
-  lsp::MessageConnection *Con =
-      lsp::createAsioTCPConnection(service, "localhost", "19191");
+  QCoreApplication App(argc, argv);
+  lsp::MessageConnection *Con = lsp::createQtTCPConnection(
+      QStringLiteral("localhost"), static_cast<quint16>(19191));
   std::function<lsp::InitializeResult(
-      const lsp::InitializeParams<std::string> &)>
+      const lsp::InitializeParams<QString> &)>
       Func(&asd);
   Con->registerRequestHandler(lsp::InitializeRequest, Func);
   Con->registerRequestHandler(lsp::TextDocumentFormatting,
@@ -46,7 +44,7 @@ int main(int argc, char *argv[]) {
   Con->listen();
 
   try {
-    std::thread asd([Con] {
+    std::thread Worker([Con] {
       try {
         while (true)
           Con->processMessageQueue();
@@ -54,7 +52,8 @@ int main(int argc, char *argv[]) {
         return;
       }
     });
-    service.run();
+    Worker.detach();
+    return App.exec();
   } catch (std::exception &e) {
     std::cerr << "Exception: " << e.what() << "\n";
   }

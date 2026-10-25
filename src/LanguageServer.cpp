@@ -1,39 +1,44 @@
 // SPDX-License-Identifier: AGPL-3.0-only
-#include "lsp/LanguageServer.h"
+#include "LanguageServer.h"
 
 using namespace lsp;
 
 template <typename T1, typename T2, typename T3>
 static typename std::enable_if<!std::is_void<T2>::value,
-                               std::function<void(const json &, json &)>>::type
+                               std::function<json(const json &)>>::type
 createWrapperFunction(T1 *Target, T2 (T1::*TargetFunction)(const T3 &)) {
   std::function<T2(T3)> Func =
       std::bind(TargetFunction, Target, std::placeholders::_1);
-  return [Func](const json &JsonParams, json &JsonResult) {
-    T3 Params = JsonParams;
+  return [Func](const json &JsonParams) -> json {
+    T3 Params = from_json<T3>(JsonParams);
     T2 Result = Func(Params);
-    JsonResult = Result;
+    return to_json(Result);
   };
 }
 
 template <typename T1, typename T2, typename T3>
 static typename std::enable_if<std::is_void<T2>::value,
-                               std::function<void(const json &, json &)>>::type
+                               std::function<json(const json &)>>::type
 createWrapperFunction(T1 *Target, T2 (T1::*TargetFunction)(const T3 &)) {
   std::function<T2(T3)> Func =
       std::bind(TargetFunction, Target, std::placeholders::_1);
-  return [Func](const json &JsonParams, json &JsonResult) {
-    T3 Params = JsonParams;
+  return [Func](const json &JsonParams) -> json {
+    T3 Params = from_json<T3>(JsonParams);
     Func(Params);
+    return json(QJsonValue::Null);
   };
 }
 
 template <typename T1, typename T2>
 static typename std::enable_if<std::is_void<T2>::value,
-                               std::function<void(const json &, json &)>>::type
+                               std::function<json(const json &)>>::type
 createWrapperFunction(T1 *Target, T2 (T1::*TargetFunction)()) {
   std::function<T2()> Func = std::bind(TargetFunction, Target);
-  return [Func](const json &JsonParams, json &JsonResult) { Func(); };
+  return [Func](const json &JsonParams) -> json {
+    (void)JsonParams;
+    Func();
+    return json(QJsonValue::Null);
+  };
 }
 
 void LanguageServer::connect(MessageConnection &Connection) {

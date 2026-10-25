@@ -2,7 +2,7 @@
 #ifndef LSP_LOGGER_H
 #define LSP_LOGGER_H
 
-#include <string>
+#include <QString>
 
 namespace lsp {
 
@@ -11,31 +11,31 @@ namespace lsp {
 class Logger {
 public:
   /// Log an error message
-  virtual void error(const std::string &Message) const = 0;
+  virtual void error(const QString &Message) const = 0;
 
   /// Log an info message
-  virtual void info(const std::string &Message) const = 0;
+  virtual void info(const QString &Message) const = 0;
 
   /// Log a warning message
-  virtual void warning(const std::string &Message) const = 0;
+  virtual void warning(const QString &Message) const = 0;
 
   /// Log a generic message
-  virtual void log(const std::string &Message) const = 0;
+  virtual void log(const QString &Message) const = 0;
 };
 
 class NullLogger : public Logger {
 public:
   /// Log an error message
-  virtual void error(const std::string &Message) const {}
+  virtual void error(const QString &Message) const {}
 
   /// Log an info message
-  virtual void info(const std::string &Message) const  {}
+  virtual void info(const QString &Message) const  {}
 
   /// Log a warning message
-  virtual void warning(const std::string &Message) const  {}
+  virtual void warning(const QString &Message) const  {}
 
   /// Log a generic message
-  virtual void log(const std::string &Message) const  {}
+  virtual void log(const QString &Message) const  {}
 };
 }
 #endif

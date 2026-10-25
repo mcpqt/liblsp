@@ -2,10 +2,10 @@
 #ifndef LSP_MESSAGECONNECTION_H
 #define LSP_MESSAGECONNECTION_H
 
-#include <lsp/Logger.h>
-#include <lsp/jsonrpc/MessageReader.h>
-#include <lsp/jsonrpc/MessageWriter.h>
-#include <lsp/protocol/LSProtocol.h>
+#include "Logger.h"
+#include "jsonrpc/MessageReader.h"
+#include "jsonrpc/MessageWriter.h"
+#include "protocol/LSProtocol.h"
 
 #include <condition_variable>
 #include <functional>
@@ -13,14 +13,10 @@
 #include <queue>
 #include <thread>
 
-#include <nlohmann/json.hpp>
-
-using json = nlohmann::json;
-
 namespace lsp {
 
-typedef std::function<void(const json &)> NotificationHandler;
-typedef std::function<void(const json &, json &)> RequestHandler;
+typedef std::function<void(const QJsonValue &)> NotificationHandler;
+typedef std::function<QJsonValue(const QJsonValue &)> RequestHandler;
 
 /// Message connection for passing messages between client and server
 /// The MessageConnection class is thread save for all operations.
@@ -35,11 +31,11 @@ class MessageConnection {
   /// Queue for incomming JSON-RPC requests
   std::queue<MessagePtr> RequestQueue;
   /// Lookup map for request handlers
-  std::map<std::string, RequestHandler> RequestHandlers;
+  std::map<QString, RequestHandler> RequestHandlers;
   /// Lookup map for notification handlers
-  std::map<std::string, NotificationHandler> NotificationHandlers;
+  std::map<QString, NotificationHandler> NotificationHandlers;
   /// Lookup map for response data
-  std::map<std::string, MessagePtr> ResponseMap;
+  std::map<QString, MessagePtr> ResponseMap;
 
   // Thread mutexes
   std::mutex RequestMutex;
@@ -88,8 +84,7 @@ public:
   template <typename ParamType>
   void sendNotification(NotificationType<ParamType> Type, const ParamType &Params) {
     std::unique_ptr<NotificationMessage> Msg = std::make_unique<NotificationMessage>(Type.method());
-    json &JsonParams = Msg->getParams();
-    JsonParams = Params;
+    Msg->data()["params"] = to_json(Params);
     Writer->write(std::move(Msg));
   }
 

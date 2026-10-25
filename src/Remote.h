@@ -2,8 +2,8 @@
 #ifndef LSP_REMOTE_H
 #define LSP_REMOTE_H
 
-#include <lsp/jsonrpc/MessageConnection.h>
-#include <lsp/protocol/LSProtocol.h>
+#include "jsonrpc/MessageConnection.h"
+#include "protocol/LSProtocol.h"
 
 namespace lsp {
 class Remote {
