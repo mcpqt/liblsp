@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 #ifndef LSPROTOCOL_H
 #define LSPROTOCOL_H
-#include "rpc/json.h"
+#include "json.h"
 
 #include <QString>
 
@@ -13,6 +13,10 @@
 #include <vector>
 
 namespace lsp {
+
+using jsonrpc::as_object;
+using jsonrpc::from_json;
+using jsonrpc::to_json;
 
 enum class TraceLevels { Off, Messages, Verbose };
 

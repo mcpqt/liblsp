@@ -2,12 +2,14 @@
 #ifndef LSP_LSP_H
 #define LSP_LSP_H
 
-#include "rpc/session.h"
+#include "session.h"
 
 #include <QString>
 #include <memory>
 
 namespace lsp {
+
+using Session = jsonrpc::Session;
 
 std::unique_ptr<Session> createStdIoConnection();
 std::unique_ptr<Session> createQtTCPConnection(const QString &Hostname, quint16 Port);

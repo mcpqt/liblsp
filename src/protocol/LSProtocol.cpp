@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-only
-#include "rpc/json.h"
+#include "json.h"
 #include "protocol/LSProtocol.h"
 
 using namespace lsp;

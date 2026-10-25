@@ -10,9 +10,9 @@ createWrapperFunction(T1 *Target, T2 (T1::*TargetFunction)(const T3 &)) {
   std::function<T2(T3)> Func =
       std::bind(TargetFunction, Target, std::placeholders::_1);
   return [Func](const QJsonValue &JsonParams) -> QJsonValue {
-    T3 Params = rpc::from_json<T3>(JsonParams);
+    T3 Params = jsonrpc::from_json<T3>(JsonParams);
     T2 Result = Func(Params);
-    return rpc::to_json(Result);
+    return jsonrpc::to_json(Result);
   };
 }
 
@@ -23,7 +23,7 @@ createWrapperFunction(T1 *Target, T2 (T1::*TargetFunction)(const T3 &)) {
   std::function<T2(T3)> Func =
       std::bind(TargetFunction, Target, std::placeholders::_1);
   return [Func](const QJsonValue &JsonParams) -> QJsonValue {
-    T3 Params = rpc::from_json<T3>(JsonParams);
+    T3 Params = jsonrpc::from_json<T3>(JsonParams);
     Func(Params);
     return QJsonValue(QJsonValue::Null);
   };
@@ -41,7 +41,7 @@ createWrapperFunction(T1 *Target, T2 (T1::*TargetFunction)()) {
   };
 }
 
-void LanguageServer::connect(rpc::Session &Connection) {
+void LanguageServer::connect(jsonrpc::Session &Connection) {
   Connection.set_request_handler(
       "initialize", createWrapperFunction(this, &LanguageServer::initialize));
   Connection.set_notification_handler(

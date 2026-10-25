@@ -2,7 +2,7 @@
 #include <QCoreApplication>
 #include "lsp.h"
 #include "protocol/LSProtocol.h"
-#include "rpc/json.h"
+#include "json.h"
 
 #include <cstdlib>
 #include <iostream>
