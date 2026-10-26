@@ -12,7 +12,7 @@ namespace lsp {
 using Session = jsonrpc::Session;
 
 std::unique_ptr<Session> createStdIoConnection();
-std::unique_ptr<Session> createQtTCPConnection(const QString &Hostname, quint16 Port);
+std::unique_ptr<Session> createTCPConnection(const QString &Hostname, quint16 Port);
 
 } // namespace lsp
 #endif

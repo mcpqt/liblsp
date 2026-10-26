@@ -29,7 +29,7 @@ void TDchange(const lsp::TextDocumentDidChangeParams &Params) { return; }
 
 int main(int argc, char *argv[]) {
   QCoreApplication App(argc, argv);
-  auto Con = lsp::createQtTCPConnection(
+  auto Con = lsp::createTCPConnection(
       QStringLiteral("localhost"), static_cast<quint16>(19191));
 
   Con->set_request_handler(

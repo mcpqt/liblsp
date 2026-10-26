@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 #include "lsp.h"
 
-#include "qt_tcp_transport.h"
+#include "tcp_transport.h"
 #include "session.h"
 #include "stdio_transport.h"
 
@@ -16,7 +16,7 @@ std::unique_ptr<lsp::Session> createStdIoConnection() {
   return std::make_unique<Session>(std::move(transport));
 }
 
-std::unique_ptr<lsp::Session> createQtTCPConnection(const QString &Hostname,
+std::unique_ptr<lsp::Session> createTCPConnection(const QString &Hostname,
                                                     quint16 Port) {
   QTcpSocket *Socket = new QTcpSocket();
   Socket->connectToHost(Hostname, Port);
@@ -26,7 +26,7 @@ std::unique_ptr<lsp::Session> createQtTCPConnection(const QString &Hostname,
     throw std::runtime_error(ErrorString.toUtf8().constData());
   }
 
-  auto transport = std::make_unique<jsonrpc::rpc::QtTcpTransport>(Socket);
+  auto transport = std::make_unique<jsonrpc::TcpTransport>(Socket);
   return std::make_unique<Session>(std::move(transport));
 }
 
